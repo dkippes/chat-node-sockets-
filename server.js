@@ -1,12 +1,24 @@
 const { Server } = require('net');
 const server = new Server();
 
+const END = 'END';
+
 // This give me a socket
 server.on('connection', (socket) => {
-	console.log(`New connection from ${socket.remoteAddress}:${socket.remotePort}`); // V4 - new connection
+	const remoteSocket = `${socket.remoteAddress}:${socket.remotePort}`;
+	console.log(`New connection from ${remoteSocket}`); // V4 - new connection
 	socket.setEncoding('utf-8'); // Deco Buffer
-	socket.on('data', (data) => {
-		socket.write(data);
+	socket.on('data', (message) => {
+		if (message === END) {
+			
+			socket.end();
+		} else {
+			console.log(`${remoteSocket} -> ${message}`);
+		}
+	});
+
+	socket.on('close', () => {
+		console.log(`Connection with ${remoteSocket} closed`);
 	});
 });
 
